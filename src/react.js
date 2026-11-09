@@ -13,10 +13,7 @@ const I18nContext = createContext({ lang: 'en', setLang: () => {}, T: passthroug
 export function I18nProvider({ catalogs, lang: controlled, defaultLang = 'en', children }) {
   const [inner, setInner] = useState(defaultLang);
   const lang = controlled ?? inner;
-  const value = useMemo(
-    () => ({ lang, setLang: setInner, T: createT(catalogs, lang) }),
-    [catalogs, lang],
-  );
+  const value = useMemo(() => ({ lang, setLang: setInner, T: createT(catalogs, lang) }), [catalogs, lang]);
   return createElement(I18nContext.Provider, { value }, children);
 }
 

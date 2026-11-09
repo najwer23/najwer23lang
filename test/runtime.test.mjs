@@ -1,5 +1,5 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { createT, interpolate } from '../src/index.js';
 
 const pl = { Save: 'Zapisz', 'Hello, {name}': 'Witaj, {name}!', Empty: '' };

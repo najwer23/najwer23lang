@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadConfig, CONFIG_FILE } from '../src/config.mjs';
+import { CONFIG_FILE, loadConfig } from '../src/config.mjs';
 import { run } from '../src/extract.mjs';
 
 const HELP = `najwer23lang — extract T("...") phrases into translation JSON files
@@ -62,7 +62,9 @@ function extract() {
   console.log(`${result.phrases} phrase(s) in ${result.files} file(s)`);
   for (const l of result.langs) {
     const parts = [];
-    parts.push(l.untranslated.length ? `${c.red}${l.untranslated.length} untranslated${c.off}` : `${c.green}complete${c.off}`);
+    parts.push(
+      l.untranslated.length ? `${c.red}${l.untranslated.length} untranslated${c.off}` : `${c.green}complete${c.off}`,
+    );
     if (l.unusedCount) parts.push(`${l.unusedCount} unused kept in ${config.unusedKey}`);
     if (check && l.changed) parts.push(`${c.yellow}out of date${c.off}`);
     console.log(`  ${l.lang}  ${parts.join(', ')} ${c.dim}${path.relative(process.cwd(), l.file)}${c.off}`);

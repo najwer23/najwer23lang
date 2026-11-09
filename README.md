@@ -3,7 +3,7 @@
 Write plain English in your code, extract every phrase to JSON, translate.
 
 ```jsx
-<h1>{T('Hello, I am Mariusz')}</h1>
+<h1>{T('Hello, I am Mariusz')}</h1>;
 ```
 
 ```bash
@@ -18,7 +18,7 @@ Fill in the empty values and you're done. **Zero dependencies**, no Babel, no bu
 
 ## Why
 
-Key-based i18n libraries make you invent names (`home.hero.title`), jump between code and JSON, and clean up stale keys. With najwer23lang the English text *is* the key. You write the sentence where it is used, and a small script collects them.
+Key-based i18n libraries make you invent names (`home.hero.title`), jump between code and JSON, and clean up stale keys. With najwer23lang the English text _is_ the key. You write the sentence where it is used, and a small script collects them.
 
 - Zero dependencies (just Node 18+)
 - Works with any framework; React bindings included (optional)
@@ -136,12 +136,12 @@ Re-render your UI yourself when `lang` changes.
 
 ## CLI
 
-| Command | What it does |
-| --- | --- |
-| `najwer23lang` | Scan the source folder and update the JSON files |
-| `najwer23lang --check` | Write nothing. Exit code `1` if a file is out of date or has empty translations (use in CI) |
-| `najwer23lang init` | Create `najwer23lang.config.json` |
-| `najwer23lang -c path/to/config.json` | Use a specific config file |
+| Command                               | What it does                                                                                |
+| ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `najwer23lang`                        | Scan the source folder and update the JSON files                                            |
+| `najwer23lang --check`                | Write nothing. Exit code `1` if a file is out of date or has empty translations (use in CI) |
+| `najwer23lang init`                   | Create `najwer23lang.config.json`                                                           |
+| `najwer23lang -c path/to/config.json` | Use a specific config file                                                                  |
 
 Handy scripts:
 
@@ -158,28 +158,28 @@ Handy scripts:
 
 Put these in `najwer23lang.config.json`, or under a `"najwer23lang"` key in `package.json`.
 
-| Option | Default | Description |
-| --- | --- | --- |
-| `langs` | *(required)* | Target languages, one JSON file each (e.g. `["pl", "de"]`) |
-| `src` | `"src"` | Folder to scan |
-| `out` | `"src/locales"` | Where the `<lang>.json` files are written |
-| `fn` | `"T"` | Name of the translate function to look for |
-| `extensions` | `.js .jsx .ts .tsx .mjs .cjs` | File types to scan |
-| `ignore` | `node_modules locales dist build coverage .git` | Folder names to skip |
-| `unusedKey` | `"__unused"` | Section where translations of removed phrases are kept |
+| Option       | Default                                         | Description                                                |
+| ------------ | ----------------------------------------------- | ---------------------------------------------------------- |
+| `langs`      | _(required)_                                    | Target languages, one JSON file each (e.g. `["pl", "de"]`) |
+| `src`        | `"src"`                                         | Folder to scan                                             |
+| `out`        | `"src/locales"`                                 | Where the `<lang>.json` files are written                  |
+| `fn`         | `"T"`                                           | Name of the translate function to look for                 |
+| `extensions` | `.js .jsx .ts .tsx .mjs .cjs`                   | File types to scan                                         |
+| `ignore`     | `node_modules locales dist build coverage .git` | Folder names to skip                                       |
+| `unusedKey`  | `"__unused"`                                    | Section where translations of removed phrases are kept     |
 
 ## How translations are protected
 
 Each run merges the phrases found in code into the existing JSON:
 
-| Situation | Result |
-| --- | --- |
-| Phrase still in code | Translation kept |
-| New phrase | Added with an empty value |
-| Translated phrase no longer in code (deleted, or the English was edited) | Moved to `__unused`, not deleted |
-| Phrase comes back later | Translation restored from `__unused` |
-| Untranslated phrase removed from code | Dropped (there was nothing to lose) |
-| JSON file is corrupt | Run aborts, file is not touched |
+| Situation                                                                | Result                               |
+| ------------------------------------------------------------------------ | ------------------------------------ |
+| Phrase still in code                                                     | Translation kept                     |
+| New phrase                                                               | Added with an empty value            |
+| Translated phrase no longer in code (deleted, or the English was edited) | Moved to `__unused`, not deleted     |
+| Phrase comes back later                                                  | Translation restored from `__unused` |
+| Untranslated phrase removed from code                                    | Dropped (there was nothing to lose)  |
+| JSON file is corrupt                                                     | Run aborts, file is not touched      |
 
 When you edit an English sentence, the old translation shows up in `__unused`. Copy it to the new key, fix it, and delete it from `__unused` whenever you like. The runtime ignores that section.
 
@@ -212,14 +212,14 @@ import { I18nProvider, useT, useI18n } from 'najwer23lang/react';
 import { run, extractPhrases, buildCatalog } from 'najwer23lang/extract';
 ```
 
-| Export | Description |
-| --- | --- |
-| `createT(catalogs, lang)` | Returns `T(text, vars?)`. `lang` is a string or a function |
-| `interpolate(text, vars)` | Replaces `{name}` placeholders |
+| Export                                       | Description                                                         |
+| -------------------------------------------- | ------------------------------------------------------------------- |
+| `createT(catalogs, lang)`                    | Returns `T(text, vars?)`. `lang` is a string or a function          |
+| `interpolate(text, vars)`                    | Replaces `{name}` placeholders                                      |
 | `<I18nProvider catalogs lang? defaultLang?>` | Provides `T` and language state. Pass `lang` to control it yourself |
-| `useT()` | Returns `T` |
-| `useI18n()` | Returns `{ lang, setLang, T }` |
-| `run(config, { check? })` | Programmatic version of the CLI |
+| `useT()`                                     | Returns `T`                                                         |
+| `useI18n()`                                  | Returns `{ lang, setLang, T }`                                      |
+| `run(config, { check? })`                    | Programmatic version of the CLI                                     |
 
 Without a provider, `useT()` returns a pass-through function, so components still render English in tests.
 

@@ -1,10 +1,10 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { extractPhrases, buildCatalog, run, unescapeString } from '../src/extract.mjs';
+import { test } from 'node:test';
 import { DEFAULTS } from '../src/config.mjs';
+import { buildCatalog, extractPhrases, run, unescapeString } from '../src/extract.mjs';
 
 function project(files) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'plainlate-'));
@@ -58,7 +58,7 @@ test('skips node_modules and the output folder', () => {
 });
 
 test('unescapeString handles common escapes', () => {
-  assert.equal(unescapeString('a\\nb\\tc\\\'d'), "a\nb\tc'd");
+  assert.equal(unescapeString("a\\nb\\tc\\'d"), "a\nb\tc'd");
   assert.equal(unescapeString('z\\u0105'), 'zą');
 });
 
