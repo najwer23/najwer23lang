@@ -3,7 +3,7 @@
 Write plain English in your code, extract every phrase to JSON, translate.
 
 ```jsx
-<h1>{T('Hello, I am Mariusz')}</h1>;
+export const Hero = () => <h1>{T('Hello, I am Mariusz')}</h1>;
 ```
 
 ```bash
@@ -14,18 +14,32 @@ npx najwer23lang
 { "Hello, I am Mariusz": "" }
 ```
 
-Fill in the empty values and you're done. **Zero dependencies**, no Babel, no build step, and **it never deletes a translation**.
+Fill in the empty values and you're done. **Zero dependencies**, no Babel, no build step, and **translations you wrote are never deleted**.
 
 ## Why
 
-Key-based i18n libraries make you invent names (`home.hero.title`), jump between code and JSON, and clean up stale keys. With najwer23lang the English text _is_ the key. You write the sentence where it is used, and a small script collects them.
+Key-based setups usually mean inventing names (`home.hero.title`), jumping between code and JSON, and cleaning up stale keys. With najwer23lang the English text _is_ the key. You write the sentence where it is used, and a small script collects them.
 
-- Zero dependencies (just Node 18+)
-- Works with any framework; React bindings included (optional)
-- Safe re-runs: edited or removed phrases move to an `__unused` section instead of vanishing
+- Zero dependencies (Node 18 or newer; the tests pass on Node 18 and 22)
+- Framework-agnostic core and extractor; React bindings included (optional)
+- Safe re-runs: translated phrases that are edited or removed move to an `__unused` section instead of vanishing
 - `--check` mode for CI: fails on empty translations or stale files
-- Warns about `T()` calls it cannot read (variables, `${}` templates) instead of skipping them silently
+- Warns about `T()` calls with a variable or a `${}` template, which it cannot extract
 - Configurable function name (`T`, `t`, `tr`, ...)
+
+## How it compares
+
+najwer23lang is a small, dependency-free tool for small projects. It is not a replacement for mature libraries.
+
+|                              | najwer23lang     | Lingui             | i18next              |
+| ---------------------------- | ---------------- | ------------------ | -------------------- |
+| English text as key          | yes              | yes                | optional             |
+| Extracts phrases to JSON     | yes (regex)      | yes (parser)       | via `i18next-parser` |
+| Keeps removed translations   | yes (`__unused`) | yes (obsolete)     | depends on settings  |
+| Plurals, rich text with tags | no               | yes                | yes                  |
+| Dependencies / build step    | none / none      | CLI + macro plugin | several / none       |
+
+Choose Lingui or i18next for plural-heavy languages, tags inside sentences, or translation platforms. Choose najwer23lang if you want a tiny, readable setup.
 
 ## Install
 
@@ -116,11 +130,11 @@ function LanguageSwitch() {
 }
 ```
 
-Untranslated or empty entries fall back to the original English text, so a half-translated app never shows blanks.
+An empty or missing translation falls back to the key itself. With English phrases as keys, that is the English sentence. With tokens (see [Tokens](#tokens)), you also need an `en.json`, otherwise the raw token is shown.
 
 ## Not using React?
 
-The core is framework-agnostic:
+The core does not depend on React:
 
 ```js
 import { createT } from 'najwer23lang';
@@ -132,7 +146,7 @@ const T = createT({ pl }, () => lang); // or a fixed string: createT({ pl }, 'pl
 T('Welcome back, {name}!', { name: 'Anna' });
 ```
 
-Re-render your UI yourself when `lang` changes.
+Re-render your UI yourself when `lang` changes. The extractor scans `.js .jsx .ts .tsx .mjs .cjs` files by default; add other extensions (for example `.vue`) in the config.
 
 ## CLI
 
@@ -189,20 +203,48 @@ Still commit your locale files to git. It costs nothing and gives you history.
 
 The extractor reads your source as text, so a few rules apply:
 
-- **Use literal strings.** `T('Save')` works. `T(label)` and ``T(`Hi ${name}`)`` cannot be extracted (you get a warning).
+- **Use literal strings.** `T('Save')` works. `T(label)` and ``T(`Hi ${name}`)`` cannot be extracted, and you get a warning.
+- **Do not concatenate.** `T('Hi ' + name)` extracts the phrase `Hi ` and gives no warning. Use a placeholder instead.
 - **Put variables in placeholders:** `T('Hi, {name}', { name })`.
 - **Quotes:** use backticks for text containing `'` or `"`: ``T(`Don't do this`)``.
 - **Mixed text and tags:** `Click <b>here</b>` should be split into separate `T()` calls, or kept as one phrase with placeholders. Word order differs between languages, so avoid gluing sentence fragments together.
 - **Same word, different meaning** (e.g. the verb "Open" vs the status "Open") shares one translation. Add a distinguishing suffix if needed: `T('Open (status)')`.
 - **Trailing spaces count.** `'Total: '` and `'Total:'` are different keys. Prefer `{T('Total:')} {value}`.
 
-Tokens work too. If you prefer stable keys for long content, write `T('Project_Description')` and fill `en.json` yourself (add `"en"` to `langs`, and pass `{ en, pl }` to the provider). The extractor does not care what is inside the string.
+## Tokens
+
+If you prefer stable keys for long content, write `T('Project_Description')`, add `"en"` to `langs`, and fill `en.json` yourself:
+
+```json
+{ "langs": ["en", "pl"] }
+```
+
+The extractor does not care what is inside the string. Pass both files to the provider:
+
+```jsx
+import en from './locales/en.json';
+import pl from './locales/pl.json';
+
+root.render(
+  <I18nProvider catalogs={{ en, pl }} defaultLang="en">
+    <App />
+  </I18nProvider>,
+);
+```
+
+A token does not change when you reword the text, so the translation stays attached to it. The cost is that the English text lives in `en.json` instead of next to the JSX. Run `najwer23lang --check` before a release to list empty entries.
 
 ## Limitations
 
 - **Regex-based, not a parser.** A commented-out `T("old")` is still extracted, and a local variable named `T` would match. Pick a unique `fn` name if that is a problem.
+- **String concatenation is not detected.** See the rules above.
 - **No plural rules yet.** For now, use separate phrases or `Intl.PluralRules` in your own code.
 - **Content from a database or API** is not in your source, so it cannot be extracted. Translate it at the source and use `T()` only for text that lives in your code.
+
+## Roadmap
+
+- Plural support (`Intl.PluralRules`)
+- Parser-based extraction (ignore comments, handle concatenation and other edge cases)
 
 ## API
 
@@ -212,16 +254,16 @@ import { I18nProvider, useT, useI18n } from 'najwer23lang/react';
 import { run, extractPhrases, buildCatalog } from 'najwer23lang/extract';
 ```
 
-| Export                                       | Description                                                         |
-| -------------------------------------------- | ------------------------------------------------------------------- |
-| `createT(catalogs, lang)`                    | Returns `T(text, vars?)`. `lang` is a string or a function          |
-| `interpolate(text, vars)`                    | Replaces `{name}` placeholders                                      |
-| `<I18nProvider catalogs lang? defaultLang?>` | Provides `T` and language state. Pass `lang` to control it yourself |
-| `useT()`                                     | Returns `T`                                                         |
-| `useI18n()`                                  | Returns `{ lang, setLang, T }`                                      |
-| `run(config, { check? })`                    | Programmatic version of the CLI                                     |
+| Export                                       | Description                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `createT(catalogs, lang)`                    | Returns `T(text, vars?)`. `lang` is a string or a function                                                              |
+| `interpolate(text, vars)`                    | Replaces `{name}` placeholders                                                                                          |
+| `<I18nProvider catalogs lang? defaultLang?>` | Provides `T` and language state. Pass `lang` to control it yourself                                                     |
+| `useT()`                                     | Returns `T`                                                                                                             |
+| `useI18n()`                                  | Returns `{ lang, setLang, T }`                                                                                          |
+| `run(config, { check? })`                    | Runs the extraction. `config` must be complete: `cwd`, `src`, `out`, `langs`, `fn`, `extensions`, `ignore`, `unusedKey` |
 
-Without a provider, `useT()` returns a pass-through function, so components still render English in tests.
+`useT()` is a React hook, so call it inside a component, not at module level. Without a provider, it returns a pass-through function, so components still render English in tests.
 
 ## Contributing
 
@@ -231,8 +273,14 @@ cd najwer23lang
 npm test
 ```
 
-Issues and pull requests are welcome.
+# Let's connect!
 
-## License
-
-MIT
+**Portfolio:** https://najwer23.github.io  
+**Résumé:** https://najwer23.github.io/resume  
+**X:** https://twitter.com/najwer23  
+**LinkedIn:** https://www.linkedin.com/in/najwer23  
+**LeetCode:** https://leetcode.com/najwer23  
+**NPM:** https://www.npmjs.com/~najwer23 <br>
+**Gitfut:** https://gitfut.com/najwer23  
+**Nook:** https://najwer23.github.io/nook  
+**Blog** https://najwer23.github.io/#/blog
