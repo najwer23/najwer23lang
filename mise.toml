@@ -1,0 +1,51 @@
+[tools]
+node = "26"
+yarn = "4.18.1"
+
+[tasks.setup]
+description = "Show tool versions and install dependencies"
+run = ["mise current", "yarn install"]
+
+[tasks.start]
+description = "Start Storybook on port 6006"
+run = "yarn start"
+
+[tasks.build]
+description = "Build the library"
+run = "yarn build"
+
+[tasks.build-storybook]
+description = "Build Storybook"
+run = "yarn build-storybook"
+
+[tasks.deploy]
+description = "Build Storybook and publish to gh-pages"
+run = "yarn deploy"
+
+[tasks.format]
+description = "Format and lint with Biome"
+run = "yarn format"
+
+[tasks.plop]
+description = "Generate a component, then format and start Storybook"
+run = "yarn plop"
+
+[tasks.release]
+description = "Build and release with Changesets"
+run = "yarn release"
+
+[tasks.god]
+description = "Publish a patch version"
+run = "yarn god"
+
+[tasks."publish:patch"]
+description = "Build and publish a patch version to NPM"
+run = "yarn publish:patch"
+
+[tasks."publish:minor"]
+description = "Build and publish a minor version to NPM"
+run = "yarn publish:minor"
+
+[tasks."publish:major"]
+description = "Build and publish a major version to NPM"
+run = "yarn publish:major"
