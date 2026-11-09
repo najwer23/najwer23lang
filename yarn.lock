@@ -5,8 +5,15 @@ __metadata:
   version: 10
   cacheKey: 10
 
-"@najwer23/lang@workspace:.":
+"najwer23lang@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@najwer23/lang@workspace:."
+  resolution: "najwer23lang@workspace:."
+  peerDependencies:
+    react: ">=17"
+  peerDependenciesMeta:
+    react:
+      optional: true
+  bin:
+    najwer23lang: ./bin/cli.mjs
   languageName: unknown
   linkType: soft

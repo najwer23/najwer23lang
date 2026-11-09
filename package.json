@@ -1,7 +1,56 @@
 {
-  "name": "@najwer23/lang",
-  "version": "0.0.0",
-  "publishConfig": {
-    "access": "public"
-  }
+  "name": "najwer23lang",
+  "version": "0.1.0",
+  "description": "Write plain text in T(\"...\"), extract every phrase to JSON, translate. Zero dependencies, never deletes a translation.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "bin": "./bin/cli.mjs",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./react": {
+      "types": "./src/react.d.ts",
+      "default": "./src/react.js"
+    },
+    "./extract": {
+      "types": "./src/extract.d.ts",
+      "default": "./src/extract.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "i18n",
+    "translation",
+    "localization",
+    "l10n",
+    "extract",
+    "react",
+    "json",
+    "cli",
+    "zero-dependencies"
+  ],
+  "author": "Mariusz Najwer (https://najwer23.github.io/)",
+  "license": "MIT"
 }
