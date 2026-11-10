@@ -6,7 +6,6 @@ Write plain English in your code, extract every phrase to JSON, translate.
 [![npm downloads](https://img.shields.io/npm/dm/najwer23lang?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/najwer23lang)
 
 
-**Storybook:** https://najwer23.github.io/najwer23lang  
 **Github:** https://github.com/najwer23/najwer23lang  
 **NPM:** https://www.npmjs.com/search?q=najwer23lang
 
